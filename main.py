@@ -1,2 +1,3 @@
-Hola = 'hola'
-print(hola)
+class Funcion:
+    def __init__(self,nombre):
+        self.nombre=nombre
