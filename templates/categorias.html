@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="hero-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1400&q=80');">
+        <div class="hero-content">
+            <h2 class="hero-title">Categorías desde la API</h2>
+            <p>Platos cargados dinámicamente en tiempo real. Haz clic en ellos para ver detalles.</p>
+        </div>
+    </section>
+
+    <main class="info-section">
+        <div class="section-title">
+            <h2>Filtrar por Especialidad</h2>
+            <div class="line"></div>
+            
+            <div class="filter-menu" style="display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+                <button class="btn-filter" onclick="filtrarCategoria('todas')" style="background-color: #bd1f24; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem;">Ver Todas</button>
+                <button class="btn-filter" onclick="filtrarCategoria('masas')" style="background-color: #1a1a1a; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem;">Masas</button>
+                <button class="btn-filter" onclick="filtrarCategoria('carnes')" style="background-color: #1a1a1a; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem;">Carnes</button>
+                <button class="btn-filter" onclick="filtrarCategoria('reposteria')" style="background-color: #1a1a1a; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem;">Repostería</button>
+            </div>
+        </div>
+
+        <div class="cards-container">
+            {% for plato in platos %}
+            <article class="food-card" data-category="{{ plato.categoria_tipo }}" onclick="abrirReceta('{{ plato.titulo }}', '{{ plato.ingredientes }}', '{{ plato.pasos }}')" style="cursor: pointer;">
+                <div class="card-image">
+                    <img src="{{ plato.imagen }}" alt="{{ plato.titulo }}">
+                    <span class="badge-country">{{ plato.categoria_badge }}</span>
+                </div>
+                <div class="card-content">
+                    <span class="food-category">Origen: API Pública</span>
+                    <h3>{{ plato.titulo }}</h3>
+                    <p>Haz clic para desplegar los detalles de preparación e ingredientes provistos de forma remota.</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div id="modal-receta" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background-color: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 100%; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <span onclick="cerrarReceta()" style="position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #bd1f24; font-weight: bold;">&times;</span>
+            <h3 id="receta-titulo" style="font-family: 'Cinzel', serif; color: #bd1f24; font-size: 1.8rem; margin-bottom: 15px;"></h3>
+            <h4 style="margin-bottom: 5px; font-size: 0.95rem; text-transform: uppercase; color: #1a1a1a;">Información:</h4>
+            <p id="receta-ingredientes" style="color: #555; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.5;"></p>
+            <h4 style="margin-bottom: 5px; font-size: 0.95rem; text-transform: uppercase; color: #1a1a1a;">Guía:</h4>
+            <p id="receta-pasos" style="color: #555; font-size: 0.95rem; line-height: 1.5;"></p>
+        </div>
+    </div>
+
+    <script>
+        function filtrarCategoria(categoria) {
+            const tarjetas = document.querySelectorAll('.food-card');
+            tarjetas.forEach(tarjeta => {
+                if (categoria === 'todas') {
+                    tarjeta.style.display = 'block';
+                } else {
+                    tarjeta.style.display = tarjeta.getAttribute('data-category') === categoria ? 'block' : 'none';
+                }
+            });
+        }
+
+        function abrirReceta(titulo, ingredientes, pasos) {
+            document.getElementById('receta-titulo').innerText = titulo;
+            document.getElementById('receta-ingredientes').innerText = ingredientes;
+            document.getElementById('receta-pasos').innerText = pasos;
+            document.getElementById('modal-receta').style.display = 'flex';
+        }
+
+        function cerrarReceta() {
+            document.getElementById('modal-receta').style.display = 'none';
+        }
+    </script>
+{% endblock %}

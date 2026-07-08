@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="hero-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80');">
+        <div class="hero-content">
+            <h2 class="hero-title">Culturas del Mundo</h2>
+            <p>Filtra las recetas según su procedencia geográfica y descubre tradiciones locales.</p>
+        </div>
+    </section>
+
+    <main class="info-section">
+        <div class="section-title">
+            <h2>Filtrar por Región</h2>
+            <div class="line"></div>
+        </div>
+
+        <div class="filter-menu">
+            <button class="btn-filter" onclick="filtrarRegion('todas')" style="padding: 10px 24px; border: none; border-radius: 25px; background: #bd1f24; color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">Ver Todas</button>
+            <button class="btn-filter" onclick="filtrarRegion('japon')" style="padding: 10px 24px; border: none; border-radius: 25px; background: #1a1a1a; color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">Japón</button>
+            <button class="btn-filter" onclick="filtrarRegion('mexico')" style="padding: 10px 24px; border: none; border-radius: 25px; background: #1a1a1a; color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">México</button>
+            <button class="btn-filter" onclick="filtrarRegion('china')" style="padding: 10px 24px; border: none; border-radius: 25px; background: #1a1a1a; color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">China</button>
+        </div>
+
+        <div class="cards-container">
+            {% for plato in platos %}
+            <div class="food-card" data-region="{{ plato.region_tipo }}">
+                <div class="card-image">
+                    <img src="{{ plato.imagen }}" alt="{{ plato.titulo }}">
+                    <span class="badge-country">{{ plato.region_badge }}</span>
+                </div>
+                <div class="card-content">
+                    <span class="food-category" style="color: #666; font-size: 0.7rem;">{{ plato.origen }}</span>
+                    <h3 style="margin-top: 5px;">{{ plato.titulo }}</h3>
+                    <p>Disponible en el catálogo del ecosistema gastronómico actual.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        function filtrarRegion(region) {
+            const tarjetas = document.querySelectorAll('.food-card');
+            const botones = document.querySelectorAll('.btn-filter');
+            
+            // Cambiar estados visuales de los botones
+            botones.forEach(btn => {
+                btn.style.background = '#1a1a1a';
+            });
+            event.target.style.background = '#bd1f24';
+
+            // Ocultar o mostrar tarjetas
+            tarjetas.forEach(tarjeta => {
+                if (region === 'todas' || tarjeta.getAttribute('data-region') === region) {
+                    tarjeta.style.display = 'block';
+                } else {
+                    tarjeta.style.display = 'none';
+                }
+            });
+        }
+    </script>
+{% endblock %}

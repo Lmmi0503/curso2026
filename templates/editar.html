@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 3rem 1rem; font-family: 'Montserrat', sans-serif;">
+    <div style="background: #ffffff; border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 550px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);">
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="color: #1a1a1a; margin: 0 0 0.5rem 0; font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 0.5px;">
+                Modificar Registro
+            </h2>
+            <p style="color: #666; font-size: 0.95rem; margin: 0;">Actualiza la información de tu publicación gastronómica</p>
+            <div style="width: 50px; height: 3px; background: #bd1f24; margin: 1rem auto 0 auto; border-radius: 2px;"></div>
+        </div>
+        
+        <form action="/actualizar/{{ receta[0] }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.4rem;">
+            
+            <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
+                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Tu Nombre</label>
+                    <input type="text" name="nombre_usuario" value="{{ receta[1] }}" required
+                           style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
+                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Tu Correo</label>
+                    <input type="email" name="correo_usuario" value="{{ receta[2] }}" required
+                           style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre de la Receta</label>
+                <input type="text" name="nombre_receta" value="{{ receta[3] }}" required
+                       style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none;">
+            </div>
+
+            <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
+                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Categoría</label>
+                    <select name="categoria" required
+                            style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; cursor: pointer; outline: none;">
+                        <option value="masas" {% if receta[4] == 'masas' %}selected{% endif %}>Masas / Pastas</option>
+                        <option value="carnes" {% if receta[4] == 'carnes' %}selected{% endif %}>Carnes / Aves</option>
+                        <option value="reposteria" {% if receta[4] == 'reposteria' %}selected{% endif %}>Repostería / Postres</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
+                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Región Culinaria</label>
+                    <select name="region" required
+                            style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; cursor: pointer; outline: none;">
+                        <option value="japon" {% if receta[5] == 'japon' %}selected{% endif %}>Japón / Asiática</option>
+                        <option value="mexico" {% if receta[5] == 'mexico' %}selected{% endif %}>México / Latina</option>
+                        <option value="china" {% if receta[5] == 'china' %}selected{% endif %}>China / Oriental</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Descripción y Pasos</label>
+                <textarea name="descripcion" required rows="4"
+                          style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; font-family: inherit; resize: vertical; outline: none; line-height: 1.5;">{{ receta[6] }}</textarea>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Fotografía del Platillo (Opcional)</label>
+                <input type="file" name="imagen" accept="image/*"
+                       style="padding: 8px 12px; background: #f1f5f9; color: #475569; border: 1px dashed #cbd5e1; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">
+                <small style="color: #666; font-style: italic; margin-top: 2px;">Deja este campo vacío si deseas conservar tu imagen actual.</small>
+            </div>
+
+            <button type="submit" 
+                    style="width: 100%; padding: 14px; background-color: #bd1f24; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; box-shadow: 0 4px 12px rgba(189, 31, 36, 0.25);">
+                Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

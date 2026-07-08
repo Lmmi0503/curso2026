@@ -1,0 +1,340 @@
+/* ==========================================================================
+   GOURMET MUNDO - ESTILOS PROFESIONALES (Rojo, Blanco y Gris Premium)
+   ========================================================================== */
+
+/* --- Variables de Diseño --- */
+:root {
+    --primary-color: #bd1f24;       /* Rojo Gourmet Principal */
+    --primary-hover: #961519;       /* Rojo Oscuro para Hovers */
+    --secondary-color: #1a1a1a;     /* Negro / Gris muy oscuro Premium */
+    --bg-light: #f9f9f9;            /* Blanco Roto para fondos limpios */
+    --white: #ffffff;
+    --text-dark: #222222;
+    --text-muted: #666666;
+    --border-color: #e2e2e2;
+    --font-main: 'Montserrat', sans-serif;
+    --font-heading: 'Cinzel', serif;
+    --transition-fast: all 0.3s ease;
+    --shadow-subtle: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Reset General --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- Header & Navegación --- */
+.main-header {
+    background-color: var(--white);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo h1 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.logo h1 span {
+    color: var(--primary-color);
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition-fast);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* --- Hero Section (Efecto elegante sobre imágenes Unsplash) --- */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 20px;
+    text-align: center;
+    color: var(--white);
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.hero-section p {
+    font-size: 1.2rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* --- Secciones de Información --- */
+.info-section {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+    flex: 1;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-title h2 {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 12px;
+}
+
+.section-title .line {
+    width: 70px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 0 auto;
+}
+
+/* --- Menús de Filtros (Categorías y Países) --- */
+.filter-menu {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 35px;
+    flex-wrap: wrap;
+}
+
+.btn-filter {
+    transition: var(--transition-fast) !important;
+}
+
+.btn-filter:hover {
+    background-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(189, 31, 36, 0.3);
+}
+
+/* --- Grid de Tarjetas --- */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+/* --- Tarjeta de Comida (Food Card) --- */
+.food-card {
+    background-color: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-subtle);
+    transition: var(--transition-fast);
+    border: 1px solid var(--border-color);
+}
+
+.food-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-image {
+    position: relative;
+    height: 240px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-fast);
+}
+
+.food-card:hover .card-image img {
+    transform: scale(1.06);
+}
+
+.badge-country {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card-content {
+    padding: 25px;
+}
+
+.food-category {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.card-content h3 {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    color: var(--secondary-color);
+    margin-bottom: 12px;
+}
+
+.card-content p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* --- Tablas Pro y Limpias (Para tabla.html) --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+    font-size: 0.95rem;
+    background-color: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--border-color);
+}
+
+table h2 {
+    font-family: var(--font-heading);
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+}
+
+table thead tr {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    text-align: left;
+    font-weight: 600;
+}
+
+table th, table td {
+    padding: 16px 20px;
+}
+
+table th {
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition-fast);
+}
+
+table tbody tr:nth-of-type(even) {
+    background-color: #fafafa;
+}
+
+table tbody tr:last-of-type {
+    border-bottom: 3px solid var(--primary-color);
+}
+
+table tbody tr:hover {
+    background-color: rgba(189, 31, 36, 0.03);
+}
+
+/* --- Modales Efecto Cristal --- */
+#modal-receta {
+    backdrop-filter: blur(5px);
+    transition: var(--transition-fast);
+}
+
+/* --- Footer --- */
+.main-footer {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: auto;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.main-footer p {
+    opacity: 0.7;
+}
+
+/* --- Ajustes Responsivos --- */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .main-nav ul {
+        gap: 15px;
+    }
+    .hero-title {
+        font-size: 2.2rem;
+    }
+}

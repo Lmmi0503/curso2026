@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="hero-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1400&q=80');">
+        <div class="hero-content">
+            <h2 class="hero-title">Panel de Control</h2>
+            <p>Visualiza y administra todas las recetas que han sido registradas en la base de datos local.</p>
+        </div>
+    </section>
+
+    <main class="info-section">
+        <div class="section-title">
+            <h2>Lista de Elementos Gastronómicos</h2>
+            <div class="line"></div>
+        </div>
+
+        <div style="overflow-x: auto; margin-top: 20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platillo / Autor</th>
+                        <th>Clasificación</th>
+                        <th>Descripción</th>
+                        <th>Imagen</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in inventario %}
+                    <tr>
+                        <td>
+                            <strong style="font-size: 1.1rem; color: #1a1a1a;">{{ fila[2] }}</strong>
+                            <br>
+                            <small style="color: #bd1f24; font-weight: 600;">Por: {{ fila[1] }}</small>
+                        </td>
+                        
+                        <td>
+                            <span class="badge-country" style="position: static; display: inline-block; margin-bottom: 5px; font-size: 0.7rem; padding: 4px 10px; background: #1a1a1a;">
+                                Categoría: {{ fila[4].capitalize() }}
+                            </span>
+                            <br>
+                            <span class="badge-country" style="position: static; display: inline-block; font-size: 0.7rem; padding: 4px 10px;">
+                                Región: {{ fila[6].capitalize() }}
+                            </span>
+                        </td>
+
+                        <td style="max-width: 300px; font-size: 0.9rem; color: #555; line-height: 1.4;">
+                            {{ fila[3] }}
+                        </td>
+                        
+                        <td style="text-align: center; width: 120px;">
+                            {% if fila[5] %}
+                                <img src="{{ url_for('static', filename='imagenes/' + fila[5]) }}" 
+                                     alt="{{ fila[2] }}" 
+                                     style="width: 90px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid #e0e0e0;">
+                            {% else %}
+                                <span style="color: #999; font-size: 0.85rem; font-style: italic;">Sin imagen</span>
+                            {% endif %}
+                        </td>
+
+                        <td style="text-align: center; width: 180px;">
+                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                                <a href="/editar/{{ fila[0] }}" 
+                                   style="display: inline-block; padding: 6px 12px; background-color: #212529; color: white; text-decoration: none; font-weight: 700; font-size: 0.8rem; border-radius: 4px; text-transform: uppercase; transition: background-color 0.2s;">
+                                    Editar
+                                </a>
+                                
+                                <a href="/eliminar/{{ fila[0] }}" 
+                                   onclick="return confirm('¿Estás completamente seguro de que deseas eliminar la receta «{{ fila[2] }}»? Esta acción no se puede deshacer en la base de datos.');"
+                                   style="display: inline-block; padding: 6px 12px; background-color: #dc3545; color: white; text-decoration: none; font-weight: 700; font-size: 0.8rem; border-radius: 4px; text-transform: uppercase; transition: background-color 0.2s; box-shadow: 0 2px 5px rgba(220,53,69,0.2);">
+                                    Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}
