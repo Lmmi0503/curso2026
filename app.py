@@ -13,8 +13,7 @@ def obtener_conexion():
     conn = sqlite3.connect(DB_FILE)
     return conn
 
-# Forzamos la creación de las tablas antes de procesar cualquier petición
-@app.before_request
+# Inicialización limpia que se ejecuta UNA SOLA VEZ al encender el servidor en Render
 def inicializar_base_datos():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
@@ -44,6 +43,10 @@ def inicializar_base_datos():
     conexion.commit()
     cursor.close()
     conexion.close()
+
+# Ejecutar de forma segura en el contexto de Flask al arrancar
+with app.app_context():
+    inicializar_base_datos()
 
 def consultar_api(url):
     try:
