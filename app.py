@@ -1,4 +1,4 @@
-import mysql.connector
+import sqlite3
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 import os
 import urllib.request
@@ -9,12 +9,9 @@ app = Flask(__name__)
 app.secret_key = "mi_llave_secreta_super_segura_gastronomia"
 
 def obtener_conexion():
-    return mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "",
-        database= "gastronomia_db"
-    )
+    conexion = sqlite3.connect("gastronomia_db.sqlite")
+
+    return conexion
 
 def consultar_api(url):
     try:
@@ -40,7 +37,7 @@ def login():
 
         conexion = obtener_conexion()
         cursor = conexion.cursor()
-        cursor.execute("SELECT id, correo, contrasena FROM usuarios WHERE correo = %s", (correo,))
+        cursor.execute("SELECT id, correo, contrasena FROM usuarios WHERE correo = ?", (correo,))
         usuario = cursor.fetchone()
         cursor.close()
         conexion.close()
@@ -64,14 +61,14 @@ def crear_cuenta():
         conexion = obtener_conexion()
         cursor = conexion.cursor()
         
-        cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo,))
+        cursor.execute("SELECT id FROM usuarios WHERE correo = ?", (correo,))
         if cursor.fetchone():
             flash("Ese correo ya está registrado. Intenta iniciar sesión.", "error")
             cursor.close()
             conexion.close()
             return redirect(url_for('crear_cuenta'))
 
-        cursor.execute("INSERT INTO usuarios (correo, contrasena) VALUES (%s, %s)", (correo, contrasena))
+        cursor.execute("INSERT INTO usuarios (correo, contrasena) VALUES (?, ?)", (correo, contrasena))
         conexion.commit()
         cursor.close()
         conexion.close()
@@ -142,7 +139,7 @@ def registro():
     cursor = conexion.cursor()
     comando_sql = """
         INSERT INTO recetas (usuario_id, nombre_receta, categoria, region, descripcion, imagen) 
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?)
     """
     valores = (usuario_id, nombre_receta, categoria, region, descripcion, nombre_archivo)
     cursor.execute(comando_sql, valores)
@@ -163,7 +160,7 @@ def mostrar_editar(id_receta):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     # Consulta optimizada con el orden de índices exacto para editar.html
-    cursor.execute("SELECT id, usuario_id, nombre_receta, categoria, region, descripcion, imagen FROM recetas WHERE id = %s", (id_receta,))
+    cursor.execute("SELECT id, usuario_id, nombre_receta, categoria, region, descripcion, imagen FROM recetas WHERE id = ?", (id_receta,))
     receta = cursor.fetchone()
     cursor.close()
     conexion.close()
@@ -196,15 +193,15 @@ def actualizar_receta(id_receta):
         
         comando_sql = """
             UPDATE recetas 
-            SET nombre_receta=%s, categoria=%s, region=%s, descripcion=%s, imagen=%s 
-            WHERE id=%s
+            SET nombre_receta=?, categoria=?, region=?, descripcion=?, imagen=? 
+            WHERE id=?
         """
         valores = (nombre_receta, categoria, region, descripcion, nombre_archivo, id_receta)
     else:
         comando_sql = """
             UPDATE recetas 
-            SET nombre_receta=%s, categoria=%s, region=%s, descripcion=%s 
-            WHERE id=%s
+            SET nombre_receta=?, categoria=?, region=?, descripcion=? 
+            WHERE id=?
         """
         valores = (nombre_receta, categoria, region, descripcion, id_receta)
 
@@ -225,7 +222,7 @@ def eliminar_receta(id_receta):
 
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    comando_sql = "DELETE FROM recetas WHERE id = %s"
+    comando_sql = "DELETE FROM recetas WHERE id = ?"
     cursor.execute(comando_sql, (id_receta,))
     conexion.commit()
     cursor.close()
