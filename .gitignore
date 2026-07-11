@@ -1,1 +1,5 @@
-prueba2.py
+__pycache__/
+*.pyc
+.env
+venv/
+.venv
