@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 70vh; padding: 2rem 1rem; font-family: 'Montserrat', sans-serif;">
+    <div style="background: #ffffff; border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 400px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);">
+        <h2 style="color: #1a1a1a; text-align: center; margin: 0 0 1.5rem 0; font-family: 'Cinzel', serif;">Crear Cuenta</h2>
+        
+        <form action="/crear-cuenta" method="POST" style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">Correo Electrónico</label>
+                <input type="email" name="correo" required style="padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">Contraseña</label>
+                <input type="password" name="contrasena" required style="padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+            </div>
+            <button type="submit" style="width: 100%; padding: 12px; background-color: #1a1a1a; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 0.5rem;">Registrar Cuenta</button>
+        </form>
+        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1.5rem;">¿Ya tienes cuenta? <a href="/login" style="color: #bd1f24; font-weight: 600; text-decoration: none;">Inicia sesión aquí</a></p>
+    </div>
+</div>
+{% endblock %}

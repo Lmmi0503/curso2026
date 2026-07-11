@@ -1,10 +1,12 @@
 import mysql.connector
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, session, flash
 import os
 import urllib.request
 import json
 
 app = Flask(__name__)
+# Llave secreta necesaria para mantener las sesiones de usuario seguras
+app.secret_key = "mi_llave_secreta_super_segura_gastronomia"
 
 def obtener_conexion():
     return mysql.connector.connect(
@@ -28,22 +30,89 @@ def inicio():
     return render_template('inicio.html')
 
 # ==========================================
+# AUTENTICACIÓN: LOGIN, REGISTRO Y LOGOUT
+# ==========================================
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        correo = request.form.get('correo')
+        contrasena = request.form.get('contrasena')
+
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT id, correo, contrasena FROM usuarios WHERE correo = %s", (correo,))
+        usuario = cursor.fetchone()
+        cursor.close()
+        conexion.close()
+
+        if usuario and usuario[2] == contrasena:
+            session['usuario_id'] = usuario[0]
+            session['usuario_correo'] = usuario[1]
+            flash("¡Inicio de sesión exitoso!", "exito")
+            return redirect(url_for('inicio'))
+        else:
+            flash("El correo no existe o la contraseña es incorrecta.", "error")
+    
+    return render_template('login.html')
+
+@app.route('/crear-cuenta', methods=['GET', 'POST'])
+def crear_cuenta():
+    if request.method == 'POST':
+        correo = request.form.get('correo')
+        contrasena = request.form.get('contrasena')
+
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+        
+        cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo,))
+        if cursor.fetchone():
+            flash("Ese correo ya está registrado. Intenta iniciar sesión.", "error")
+            cursor.close()
+            conexion.close()
+            return redirect(url_for('crear_cuenta'))
+
+        cursor.execute("INSERT INTO usuarios (correo, contrasena) VALUES (%s, %s)", (correo, contrasena))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        
+        flash("Cuenta creada con éxito. ¡Ya puedes iniciar sesión!", "exito")
+        return redirect(url_for('login'))
+
+    return render_template('crear_cuenta.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Has cerrado sesión correctamente.", "info")
+    return redirect(url_for('inicio'))
+
+# ==========================================
 # VER PANEL COMPLETO (TABLA)
 # ==========================================
 @app.route('/tabla')
 def dashboard():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    # Traemos el id (fila[0]) y el resto de columnas necesarias
-    sql = "SELECT id, nombre_usuario, nombre_receta, descripcion, categoria, imagen, region FROM recetas"
+    sql = """
+        SELECT r.id, u.correo, r.nombre_receta, r.descripcion, r.categoria, r.imagen, r.region 
+        FROM recetas r 
+        JOIN usuarios u ON r.usuario_id = u.id
+    """
     cursor.execute(sql)
     productos_db = cursor.fetchall()
     cursor.close()
     conexion.close()
     return render_template('tabla.html', inventario=productos_db)
 
+# ==========================================
+# MOSTRAR FORMULARIO DE RECOLECCIÓN
+# ==========================================
 @app.route('/formulario')
 def f():
+    if 'usuario_id' not in session:
+        flash("Debes iniciar sesión para registrar una receta.", "error")
+        return redirect(url_for('login'))
     return render_template('formulario.html')
 
 # ==========================================
@@ -51,8 +120,10 @@ def f():
 # ==========================================
 @app.route('/registro', methods=['POST'])
 def registro():
-    nombre_usuario = request.form.get('nombre_usuario')
-    correo_usuario = request.form.get('correo_usuario')
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+    usuario_id = session['usuario_id']
     nombre_receta = request.form.get('nombre_receta')
     categoria = request.form.get('categoria')
     region = request.form.get('region')
@@ -70,10 +141,10 @@ def registro():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     comando_sql = """
-        INSERT INTO recetas (nombre_usuario, correo_usuario, nombre_receta, categoria, region, descripcion, imagen) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO recetas (usuario_id, nombre_receta, categoria, region, descripcion, imagen) 
+        VALUES (%s, %s, %s, %s, %s, %s)
     """
-    valores = (nombre_usuario, correo_usuario, nombre_receta, categoria, region, descripcion, nombre_archivo)
+    valores = (usuario_id, nombre_receta, categoria, region, descripcion, nombre_archivo)
     cursor.execute(comando_sql, valores)
     conexion.commit()
     cursor.close()
@@ -86,9 +157,13 @@ def registro():
 # ==========================================
 @app.route('/editar/<int:id_receta>')
 def mostrar_editar(id_receta):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, nombre_usuario, correo_usuario, nombre_receta, categoria, region, descripcion, imagen FROM recetas WHERE id = %s", (id_receta,))
+    # Consulta optimizada con el orden de índices exacto para editar.html
+    cursor.execute("SELECT id, usuario_id, nombre_receta, categoria, region, descripcion, imagen FROM recetas WHERE id = %s", (id_receta,))
     receta = cursor.fetchone()
     cursor.close()
     conexion.close()
@@ -102,8 +177,9 @@ def mostrar_editar(id_receta):
 # ==========================================
 @app.route('/actualizar/<int:id_receta>', methods=['POST'])
 def actualizar_receta(id_receta):
-    nombre_usuario = request.form.get('nombre_usuario')
-    correo_usuario = request.form.get('correo_usuario')
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
     nombre_receta = request.form.get('nombre_receta')
     categoria = request.form.get('categoria')
     region = request.form.get('region')
@@ -114,31 +190,46 @@ def actualizar_receta(id_receta):
     cursor = conexion.cursor()
 
     if imagen and imagen.filename != "":
-        # Si el usuario subió una nueva foto, la guardamos y actualizamos la columna de imagen
         nombre_archivo = imagen.filename
         CARPETA_IMAGENES = os.path.join('static', 'imagenes')
         imagen.save(os.path.join(CARPETA_IMAGENES, nombre_archivo))
         
         comando_sql = """
             UPDATE recetas 
-            SET nombre_usuario=%s, correo_usuario=%s, nombre_receta=%s, categoria=%s, region=%s, descripcion=%s, imagen=%s 
+            SET nombre_receta=%s, categoria=%s, region=%s, descripcion=%s, imagen=%s 
             WHERE id=%s
         """
-        valores = (nombre_usuario, correo_usuario, nombre_receta, categoria, region, descripcion, nombre_archivo, id_receta)
+        valores = (nombre_receta, categoria, region, descripcion, nombre_archivo, id_receta)
     else:
-        # Si no subió una foto nueva, conservamos la que ya estaba en la base de datos
         comando_sql = """
             UPDATE recetas 
-            SET nombre_usuario=%s, correo_usuario=%s, nombre_receta=%s, categoria=%s, region=%s, descripcion=%s 
+            SET nombre_receta=%s, categoria=%s, region=%s, descripcion=%s 
             WHERE id=%s
         """
-        valores = (nombre_usuario, correo_usuario, nombre_receta, categoria, region, descripcion, id_receta)
+        valores = (nombre_receta, categoria, region, descripcion, id_receta)
 
     cursor.execute(comando_sql, valores)
     conexion.commit()
     cursor.close()
     conexion.close()
 
+    return redirect(url_for('dashboard'))
+
+# ==========================================
+# RUTA PARA ELIMINAR UN REGISTRO (DELETE)
+# ==========================================
+@app.route('/eliminar/<int:id_receta>')
+def eliminar_receta(id_receta):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    comando_sql = "DELETE FROM recetas WHERE id = %s"
+    cursor.execute(comando_sql, (id_receta,))
+    conexion.commit()
+    cursor.close()
+    conexion.close()
     return redirect(url_for('dashboard'))
 
 # ==========================================
@@ -166,7 +257,7 @@ def categorias():
                 })
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, nombre_receta, imagen, categoria, nombre_usuario FROM recetas")
+    cursor.execute("SELECT r.id, r.nombre_receta, r.imagen, r.categoria, u.correo FROM recetas r JOIN usuarios u ON r.usuario_id = u.id")
     for fila in cursor.fetchall():
         url_img = url_for('static', filename='imagenes/' + fila[2]) if fila[2] else ""
         platos_totales.append({
@@ -175,30 +266,11 @@ def categorias():
             'imagen': url_img,
             'categoria_tipo': fila[3].lower(),
             'categoria_badge': fila[3].capitalize(),
-            'origen': f"Local por {fila[4]}"
+            'origen': f"Por: {fila[4]}"
         })
     cursor.close()
     conexion.close()
     return render_template('categorias.html', platos=platos_totales)
-
-# ==========================================
-# RUTA PARA ELIMINAR UN REGISTRO (DELETE)
-# ==========================================
-@app.route('/eliminar/<int:id_receta>')
-def eliminar_receta(id_receta):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    
-    # Ejecutamos la sentencia DELETE para borrar de HeidiSQL
-    comando_sql = "DELETE FROM recetas WHERE id = %s"
-    cursor.execute(comando_sql, (id_receta,))
-    
-    conexion.commit()
-    cursor.close()
-    conexion.close()
-    
-    # Redirigimos de vuelta al panel para ver la tabla actualizada
-    return redirect(url_for('dashboard'))
 
 @app.route('/paises')
 def paises():
@@ -222,7 +294,7 @@ def paises():
                 })
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, nombre_receta, imagen, region, nombre_usuario FROM recetas")
+    cursor.execute("SELECT r.id, r.nombre_receta, r.imagen, r.region, u.correo FROM recetas r JOIN usuarios u ON r.usuario_id = u.id")
     for fila in cursor.fetchall():
         url_img = url_for('static', filename='imagenes/' + fila[2]) if fila[2] else ""
         platos_totales.append({
@@ -231,7 +303,7 @@ def paises():
             'imagen': url_img,
             'region_tipo': fila[3].lower(),
             'region_badge': fila[3].capitalize(),
-            'origen': f"Local por {fila[4]}"
+            'origen': f"Por: {fila[4]}"
         })
     cursor.close()
     conexion.close()

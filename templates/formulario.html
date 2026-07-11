@@ -1,32 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 3rem 1rem; font-family: 'Montserrat', sans-serif;">
+<div style="background: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 2rem 1rem; font-family: 'Montserrat', sans-serif;">
     <div style="background: #ffffff; border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 550px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);">
         
         <div style="text-align: center; margin-bottom: 2rem;">
             <h2 style="color: #1a1a1a; margin: 0 0 0.5rem 0; font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 0.5px;">
                 Compartir Receta
             </h2>
-            <p style="color: #666; font-size: 0.95rem; margin: 0;">Introduce los detalles de tu creación culinaria</p>
+            <p style="color: #666; font-size: 0.95rem; margin: 0;">Publica una receta asociada automáticamente a tu cuenta</p>
             <div style="width: 50px; height: 3px; background: #bd1f24; margin: 1rem auto 0 auto; border-radius: 2px;"></div>
         </div>
         
         <form action="/registro" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.4rem;">
             
-            <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
-                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Tu Nombre</label>
-                    <input type="text" name="nombre_usuario" placeholder="Ej: Carlos" required
-                           style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px;">
-                    <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Tu Correo</label>
-                    <input type="email" name="correo_usuario" placeholder="carlos@gourmet.com" required
-                           style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none;">
-                </div>
-            </div>
-
             <div style="display: flex; flex-direction: column; gap: 0.4rem;">
                 <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre de la Receta</label>
                 <input type="text" name="nombre_receta" placeholder="Ej: Pasta Fettuccine a la Crema" required
@@ -59,7 +46,7 @@
 
             <div style="display: flex; flex-direction: column; gap: 0.4rem;">
                 <label style="color: #333333; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Descripción y Pasos</label>
-                <textarea name="descripcion" placeholder="Detalla brevemente los pasos y los ingredientes clave..." required rows="4"
+                <textarea name="descripcion" placeholder="Detalla los pasos e ingredientes..." required rows="4"
                           style="padding: 12px; background: #ffffff; color: #1a1a1a; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; font-family: inherit; resize: vertical; outline: none; line-height: 1.5;"></textarea>
             </div>
 
@@ -70,7 +57,7 @@
             </div>
 
             <button type="submit" 
-                    style="width: 100%; padding: 14px; background-color: #bd1f24; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; transition: background-color 0.2s; box-shadow: 0 4px 12px rgba(189, 31, 36, 0.25);">
+                    style="width: 100%; padding: 14px; background-color: #bd1f24; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; box-shadow: 0 4px 12px rgba(189, 31, 36, 0.25);">
                 Publicar en el Recetario
             </button>
         </form>
