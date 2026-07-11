@@ -1,4 +1,4 @@
-import sqlite3 # Cambiado a sqlite3 para Render interno
+import sqlite3
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 import os
 import urllib.request
@@ -7,20 +7,19 @@ import json
 app = Flask(__name__)
 app.secret_key = "mi_llave_secreta_super_segura_gastronomia"
 
-# Ruta del archivo de base de datos SQLite
 DB_FILE = "gastronomia_db.db"
 
 def obtener_conexion():
-    # Conecta a SQLite en vez de MySQL
     conn = sqlite3.connect(DB_FILE)
     return conn
 
-# Función para inicializar la base de datos y crear las tablas si no existen en Render
+# Forzamos la creación de las tablas antes de procesar cualquier petición
+@app.before_request
 def inicializar_base_datos():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     
-    # Crear tabla usuarios
+    # Crear tabla usuarios si no existe
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +28,7 @@ def inicializar_base_datos():
         )
     """)
     
-    # Crear tabla recetas
+    # Crear tabla recetas si no existe
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS recetas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,10 +42,8 @@ def inicializar_base_datos():
         )
     """)
     conexion.commit()
+    cursor.close()
     conexion.close()
-
-# Ejecutamos la inicialización al arrancar la app
-inicializar_base_datos()
 
 def consultar_api(url):
     try:
@@ -72,7 +69,6 @@ def login():
 
         conexion = obtener_conexion()
         cursor = conexion.cursor()
-        # En SQLite usamos ? en vez de %s
         cursor.execute("SELECT id, correo, contrasena FROM usuarios WHERE correo = ?", (correo,))
         usuario = cursor.fetchone()
         cursor.close()
