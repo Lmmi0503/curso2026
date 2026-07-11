@@ -1,17 +1,52 @@
-import sqlite3
+import sqlite3 # Cambiado a sqlite3 para Render interno
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 import os
 import urllib.request
 import json
 
 app = Flask(__name__)
-# Llave secreta necesaria para mantener las sesiones de usuario seguras
 app.secret_key = "mi_llave_secreta_super_segura_gastronomia"
 
-def obtener_conexion():
-    conexion = sqlite3.connect("gastronomia_db.sqlite")
+# Ruta del archivo de base de datos SQLite
+DB_FILE = "gastronomia_db.db"
 
-    return conexion
+def obtener_conexion():
+    # Conecta a SQLite en vez de MySQL
+    conn = sqlite3.connect(DB_FILE)
+    return conn
+
+# Función para inicializar la base de datos y crear las tablas si no existen en Render
+def inicializar_base_datos():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    
+    # Crear tabla usuarios
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            correo TEXT UNIQUE NOT NULL,
+            contrasena TEXT NOT NULL
+        )
+    """)
+    
+    # Crear tabla recetas
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS recetas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            nombre_receta TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            region TEXT NOT NULL,
+            descripcion TEXT NOT NULL,
+            imagen TEXT,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        )
+    """)
+    conexion.commit()
+    conexion.close()
+
+# Ejecutamos la inicialización al arrancar la app
+inicializar_base_datos()
 
 def consultar_api(url):
     try:
@@ -37,6 +72,7 @@ def login():
 
         conexion = obtener_conexion()
         cursor = conexion.cursor()
+        # En SQLite usamos ? en vez de %s
         cursor.execute("SELECT id, correo, contrasena FROM usuarios WHERE correo = ?", (correo,))
         usuario = cursor.fetchone()
         cursor.close()
@@ -159,7 +195,6 @@ def mostrar_editar(id_receta):
 
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    # Consulta optimizada con el orden de índices exacto para editar.html
     cursor.execute("SELECT id, usuario_id, nombre_receta, categoria, region, descripcion, imagen FROM recetas WHERE id = ?", (id_receta,))
     receta = cursor.fetchone()
     cursor.close()
